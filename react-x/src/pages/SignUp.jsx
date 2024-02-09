@@ -1,7 +1,7 @@
 import { App } from '../layouts/App'
-import '../assets/styles/home.css'
+import '../assets/styles/signUp.css'
 
-export const Home = () => ( 
+export const SignUp = () => ( 
   <App>
     <div className='sign-up-container'>
       
