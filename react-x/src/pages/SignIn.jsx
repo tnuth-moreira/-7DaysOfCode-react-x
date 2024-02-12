@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 import { App } from "../layouts/App";
 
-export const SignUp = () => {
+export const SignIn = () => {
   const {
     register,
     handleSubmit,
@@ -12,16 +12,13 @@ export const SignUp = () => {
   } = useForm();
 
   const handleFormSubmit = ({ email, password }) => {
-    console.log("Criando uma nova conta...", email, password);
+    console.log("ACESSANDO APLICAÇÃO", email, password);
   };
 
   return (
     <App>
       <div className="flex items-center justify-center w-screen h-screen flex-col">
-        <h1 className="font-sans text-3xl text-sky-500 pb-1">React-X</h1>
-        <p className="pb-5 text-gray-500">
-          Crie uma nova conta e comece aluritar agora mesmo =)
-        </p>
+        <h1 className="font-sans text-3xl text-sky-500 pb-5">React-X</h1>
         <form
           className="flex flex-col w-full lg:w-1/4 md:w-1/3 sm:w-1/2 px-10 sm:px-0"
           onSubmit={handleSubmit(handleFormSubmit)}
@@ -53,6 +50,7 @@ export const SignUp = () => {
               </span>
             ) : null}
           </div>
+
           <div className="mt-2.5">
             <input
               {...register("password", {
@@ -80,17 +78,19 @@ export const SignUp = () => {
               </span>
             ) : null}
           </div>
+
           <button
             className="mt-5 p-2 rounded bg-emerald-500 hover:bg-emerald-600 text-slate-100"
             type="submit"
           >
-            Criar uma nova conta
+            Acessar plataforma
           </button>
         </form>
+
         <span className="text-sm mt-2 text-gray-500">
-          Já possui uma conta?{" "}
-          <Link className="text-sky-500 hover:underline" to="/sign-in">
-            Acesse agora!
+          Não possui uma conta?{" "}
+          <Link className="text-sky-500 hover:underline" to="/sign-up">
+            Crie uma agora!
           </Link>
         </span>
       </div>
