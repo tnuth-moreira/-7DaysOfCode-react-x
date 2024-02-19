@@ -1,11 +1,16 @@
 import { App } from "../layouts/App";
 import { useState } from "react";
+import jwtDecode from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 export const Home = () => {
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  const user = jwtDecode(localStorage.getItem("acess-token"));
 
   const handleLogout = () => {
-    console.log("SAINDO DA APLICACAO");
+    localStorage.removeItem("acess-token");
+    navigate("/sign-in");
   };
 
   const handleFormSubmit = (event) => {
@@ -22,7 +27,7 @@ export const Home = () => {
           </span>
           <div>
             <span className="font-sans text-sm text-gray-500 mr-2">
-              email@exemplo.com
+              {user.email}
             </span>
             <button
               className="bg-red-500 text-white lowercase rounded px-2 py-1 text-sm hover:bg-red-600"

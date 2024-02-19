@@ -1,24 +1,36 @@
 import classNames from "classnames";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { App } from "../layouts/App";
 
 export const SignUp = () => {
+  const [requesting, setRequesting] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const navigate = useNavigate();
 
   const handleFormSubmit = ({ email, password }) => {
-    console.log("Criando uma nova conta...", email, password);
+    setRequesting(true);
+    const auth = getAuth();
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((credential) => {
+        localStorage.setItem("access-token", credential.user.accessToken);
+        navigate("/");
+      })
+      .catch((error) => console.error(error.message))
+      .finally(() => setRequesting(false));
   };
 
   return (
     <App>
       <div className="flex items-center justify-center w-screen h-screen flex-col">
-        <h1 className="font-sans text-3xl text-sky-500 pb-1">React-X</h1>
+        <h1 className="font-sans text-3xl text-sky-500 pb-1">Aluritter</h1>
         <p className="pb-5 text-gray-500">
           Crie uma nova conta e comece aluritar agora mesmo =)
         </p>
@@ -81,7 +93,14 @@ export const SignUp = () => {
             ) : null}
           </div>
           <button
-            className="mt-5 p-2 rounded bg-emerald-500 hover:bg-emerald-600 text-slate-100"
+            className={classNames(
+              "mt-5 p-2 rounded bg-emerald-500 text-slate-100",
+              {
+                "bg-slate-300": requesting,
+                "hover:bg-emerald-600": !requesting,
+              }
+            )}
+            disabled={requesting}
             type="submit"
           >
             Criar uma nova conta
