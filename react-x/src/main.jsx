@@ -1,11 +1,13 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import React from "react";
+import ReactDOM from "react-dom/client";
 
-import { Pages } from './pages'
-import './assets/styles/index.css'
+import { Pages } from "./pages";
+import { connect } from "./utils/firebase";
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+import "./assets/styles/index.css";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <Pages />
-  </React.StrictMode>,
-)
+    <Pages app={connect()} />
+  </React.StrictMode>
+);

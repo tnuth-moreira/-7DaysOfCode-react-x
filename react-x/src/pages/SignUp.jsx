@@ -30,7 +30,7 @@ export const SignUp = () => {
   return (
     <App>
       <div className="flex items-center justify-center w-screen h-screen flex-col">
-        <h1 className="font-sans text-3xl text-sky-500 pb-1">Aluritter</h1>
+        <h1 className="font-sans text-3xl text-sky-500 pb-1">React - X</h1>
         <p className="pb-5 text-gray-500">
           Crie uma nova conta e comece aluritar agora mesmo =)
         </p>

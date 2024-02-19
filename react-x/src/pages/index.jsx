@@ -33,14 +33,14 @@ PublicRoute.propTypes = {
   children: PropTypes.node,
 };
 
-export const Pages = () => (
+export const Pages = ({ app }) => (
   <Router>
     <Routes>
       <Route
         path="/"
         element={
           <PrivateRoute>
-            <Home />
+            <Home app={app} />
           </PrivateRoute>
         }
       />
@@ -64,3 +64,7 @@ export const Pages = () => (
     </Routes>
   </Router>
 );
+
+Pages.propTypes = {
+  app: PropTypes.any.isRequired,
+};

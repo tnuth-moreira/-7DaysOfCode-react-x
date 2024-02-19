@@ -34,7 +34,7 @@ export const SignIn = () => {
   return (
     <App>
       <div className="flex items-center justify-center w-screen h-screen flex-col">
-        <h1 className="font-sans text-3xl text-sky-500 pb-5">Aluritter</h1>
+        <h1 className="font-sans text-3xl text-sky-500 pb-5">React - X</h1>
         <form
           className="flex flex-col w-full lg:w-1/4 md:w-1/3 sm:w-1/2 px-10 sm:px-0"
           onSubmit={handleSubmit(handleFormSubmit)}

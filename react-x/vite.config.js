@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     fs: {
-      allow: ['../'] // Permitir acesso ao diretório raiz do projeto e todos os subdiretórios
+      allow: ['../'] 
     }
   }
 });

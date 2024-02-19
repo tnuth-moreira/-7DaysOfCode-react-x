@@ -1,21 +1,44 @@
-import { App } from "../layouts/App";
-import { useState } from "react";
-import jwtDecode from "jwt-decode";
+import { getDatabase, ref, set, onValue } from "firebase/database";
+import jwt_decode from "jwt-decode";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import * as uuid from "uuid";
 
-export const Home = () => {
+import { App } from "../layouts/App";
+
+export const Home = ({ app }) => {
   const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
   const navigate = useNavigate();
-  const user = jwtDecode(localStorage.getItem("acess-token"));
+  const user = jwt_decode(localStorage.getItem("access-token"));
+
+  useEffect(() => {
+    onValue(ref(getDatabase(app), "alurites"), (snapshot) => {
+      const data = [];
+      snapshot.forEach((registry) => {
+        data.push({
+          ...registry.val(),
+          id: registry.key,
+        });
+      });
+      setMessages(data);
+    });
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("acess-token");
+    localStorage.removeItem("access-token");
     navigate("/sign-in");
   };
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
-    console.log("PUBLICANDO UM NOVO TWEET");
+    const db = getDatabase(app);
+    set(ref(db, `alurites/${uuid.v4()}`), {
+      message,
+      by: user.email,
+      when: new Date().getTime(),
+    }).then(() => setMessage(""));
   };
 
   return (
@@ -23,7 +46,7 @@ export const Home = () => {
       <div className="bg-gray-100 min-h-screen w-screen">
         <div className="flex justify-between px-5 py-2 border-b bg-white">
           <span className="font-sans text-lg text-sky-500 lowercase">
-            React-X
+            React - X
           </span>
           <div>
             <span className="font-sans text-sm text-gray-500 mr-2">
@@ -38,10 +61,9 @@ export const Home = () => {
             </button>
           </div>
         </div>
-
         <div className="container mx-auto p-10">
           <form onSubmit={handleFormSubmit}>
-            <p className="text-sm text-gray-600 pl-2">Reacte agora mesmo...</p>
+            <p className="text-sm text-gray-600 pl-2">Reacter agora mesmo...</p>
             <div>
               <textarea
                 className="border rounded w-full resize-none text-gray-500 p-5 my-2"
@@ -66,24 +88,30 @@ export const Home = () => {
               </button>
             </div>
           </form>
-
           <div className="pt-5">
-            <div className="border px-4 py-2 bg-white rounded mt-5 first:mt-0">
-              <p className="text-gray-500 py-2 mb-5">
-                Pagina principal com estrutura e estilos
-              </p>
-              <div className="flex justify-between">
-                <span className="text-sm text-sky-500">
-                  email@exemplo.com.br
-                </span>
-                <time className="text-xs text-gray-500">
-                  01/01/2024 7:00:00 PM
-                </time>
-              </div>
-            </div>
+            {messages
+              .sort((m1, m2) => m2.when - m1.when)
+              .map((m) => (
+                <div
+                  className="border px-4 py-2 bg-white rounded mt-5 first:mt-0"
+                  key={m.id}
+                >
+                  <p className="text-gray-500 py-2 mb-5">{m.message}</p>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-sky-500">{m.by}</span>
+                    <time className="text-xs text-gray-500">
+                      {new Date(m.when).toLocaleString()}
+                    </time>
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
       </div>
     </App>
   );
+};
+
+Home.propTypes = {
+  app: PropTypes.any.isRequired,
 };
