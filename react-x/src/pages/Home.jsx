@@ -1,7 +1,7 @@
 import { getDatabase, ref, set, onValue } from "firebase/database";
 import jwt_decode from "jwt-decode";
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import * as uuid from "uuid";
 
@@ -11,20 +11,35 @@ export const Home = ({ app }) => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const navigate = useNavigate();
-  const user = jwt_decode(localStorage.getItem("access-token"));
+  const userRef = useRef(null);
 
   useEffect(() => {
-    onValue(ref(getDatabase(app), "alurites"), (snapshot) => {
-      const data = [];
-      snapshot.forEach((registry) => {
-        data.push({
-          ...registry.val(),
-          id: registry.key,
+    userRef.current = jwt_decode(localStorage.getItem("access-token"));
+
+    const fetchData = async () => {
+      const database = getDatabase(app);
+      const aluritesRef = ref(database, "alurites");
+
+      onValue(aluritesRef, (snapshot) => {
+        const data = [];
+        snapshot.forEach((registry) => {
+          data.push({
+            ...registry.val(),
+            id: registry.key,
+          });
         });
+        setMessages(data);
       });
-      setMessages(data);
-    });
-  }, []);
+    };
+
+    fetchData();
+
+    return () => {
+      const database = getDatabase(app);
+      const aluritesRef = ref(database, "alurites");
+      onValue(aluritesRef, null);
+    };
+  }, [app]);
 
   const handleLogout = () => {
     localStorage.removeItem("access-token");
@@ -36,7 +51,7 @@ export const Home = ({ app }) => {
     const db = getDatabase(app);
     set(ref(db, `alurites/${uuid.v4()}`), {
       message,
-      by: user.email,
+      by: userRef.current?.email,
       when: new Date().getTime(),
     }).then(() => setMessage(""));
   };
@@ -50,7 +65,7 @@ export const Home = ({ app }) => {
           </span>
           <div>
             <span className="font-sans text-sm text-gray-500 mr-2">
-              {user.email}
+              {userRef.current?.email}
             </span>
             <button
               className="bg-red-500 text-white lowercase rounded px-2 py-1 text-sm hover:bg-red-600"
@@ -63,7 +78,7 @@ export const Home = ({ app }) => {
         </div>
         <div className="container mx-auto p-10">
           <form onSubmit={handleFormSubmit}>
-            <p className="text-sm text-gray-600 pl-2">Reacter agora mesmo...</p>
+            <p className="text-sm text-gray-600 pl-2">Reacte agora mesmo...</p>
             <div>
               <textarea
                 className="border rounded w-full resize-none text-gray-500 p-5 my-2"
@@ -115,3 +130,5 @@ export const Home = ({ app }) => {
 Home.propTypes = {
   app: PropTypes.any.isRequired,
 };
+
+export default Home;

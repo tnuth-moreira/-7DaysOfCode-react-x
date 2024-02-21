@@ -3,7 +3,7 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-
+import firebaseApp from "../utils/firebase";
 import { App } from "../layouts/App";
 
 export const SignIn = () => {
@@ -16,19 +16,24 @@ export const SignIn = () => {
   } = useForm();
   const navigate = useNavigate();
 
-  const handleFormSubmit = ({ email, password }) => {
+  const handleFormSubmit = async ({ email, password }) => {
     setAuthenticating(true);
-    const auth = getAuth();
-    signInWithEmailAndPassword(auth, email, password)
-      .then((credential) => {
-        localStorage.setItem("access-token", credential.user.accessToken);
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error(error.message);
-        setAuthError(true);
-      })
-      .finally(() => setAuthenticating(false));
+    const auth = getAuth(firebaseApp);
+    try {
+      const credential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      localStorage.setItem("access-token", credential.user.accessToken);
+      setAuthError(false);
+      navigate("/home");
+    } catch (error) {
+      console.error("Erro durante a autenticação:", error.message);
+      setAuthError(true);
+    } finally {
+      setAuthenticating(false);
+    }
   };
 
   return (
@@ -93,11 +98,11 @@ export const SignIn = () => {
               </span>
             ) : null}
           </div>
-          {authError ? (
-            <p className="text-xs text-red-500 text-center mt-3">
-              Email ou senha inválidos
+          {authError && (
+            <p className="text-red-500 text-sm mt-2">
+              Credenciais inválidas. Por favor, tente novamente.
             </p>
-          ) : null}
+          )}
           <button
             className={classNames(
               "mt-5 p-2 rounded bg-emerald-500 text-slate-100",
@@ -109,7 +114,7 @@ export const SignIn = () => {
             disabled={authenticating}
             type="submit"
           >
-            Acessar plataforma
+            Entrar
           </button>
         </form>
         <span className="text-sm mt-2 text-gray-500">
@@ -122,3 +127,5 @@ export const SignIn = () => {
     </App>
   );
 };
+
+export default SignIn;

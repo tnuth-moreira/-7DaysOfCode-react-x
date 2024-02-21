@@ -3,7 +3,8 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-
+import firebaseApp from "../utils/firebase";
+import { getDatabase, ref, set } from "firebase/database";
 import { App } from "../layouts/App";
 
 export const SignUp = () => {
@@ -17,11 +18,17 @@ export const SignUp = () => {
 
   const handleFormSubmit = ({ email, password }) => {
     setRequesting(true);
-    const auth = getAuth();
+    const auth = getAuth(firebaseApp);
     createUserWithEmailAndPassword(auth, email, password)
       .then((credential) => {
-        localStorage.setItem("access-token", credential.user.accessToken);
-        navigate("/");
+        const db = getDatabase(firebaseApp);
+        set(ref(db, `users/${credential.user.uid}`), {
+          email: email,
+          createdAt: new Date().toISOString(),
+        }).then(() => {
+          localStorage.setItem("access-token", credential.user.accessToken);
+          navigate("/");
+        });
       })
       .catch((error) => console.error(error.message))
       .finally(() => setRequesting(false));
@@ -32,7 +39,7 @@ export const SignUp = () => {
       <div className="flex items-center justify-center w-screen h-screen flex-col">
         <h1 className="font-sans text-3xl text-sky-500 pb-1">React - X</h1>
         <p className="pb-5 text-gray-500">
-          Crie uma nova conta e comece aluritar agora mesmo =)
+          Crie uma nova conta e comece reactar agora mesmo =)
         </p>
         <form
           className="flex flex-col w-full lg:w-1/4 md:w-1/3 sm:w-1/2 px-10 sm:px-0"

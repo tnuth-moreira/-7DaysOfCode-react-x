@@ -1,13 +1,17 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
-
-import { Pages } from "./pages";
-import { connect } from "./utils/firebase";
-
+import { createRoot } from "react-dom/client";
+import Pages from "./pages/Pages";
+import { initializeApp } from "firebase/app";
+import firebaseConfig from "./firebaseConfig";
 import "./assets/styles/index.css";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+const rootElement = document.getElementById("root");
+
+const firebaseApp = initializeApp(firebaseConfig);
+
+const root = createRoot(rootElement);
+root.render(
   <React.StrictMode>
-    <Pages app={connect()} />
+    <Pages app={firebaseApp} />
   </React.StrictMode>
 );
